@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aanya Sharma — Intuitive Tarot Reader</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════ RESET & VARIABLES ═══════════════════ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --gold:#D4A853;--gold-lt:#E8C97A;--gold-dk:#B8923A;
+  --purple:#1A0A2E;--purple-mid:#2D1B4E;
+  --bg:#08060E;--bg-card:linear-gradient(145deg,rgba(45,27,78,.22),rgba(10,10,15,.6));
+  --text:#E8E4DD;--muted:#9B95A0;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --radius:20px;--radius-sm:12px;--radius-pill:50px;
+  --wa:#25D366;
+}
+html{scroll-behavior:smooth;background:var(--bg)}
+body{font-family:var(--serif);color:var(--text);background:var(--bg);min-height:100vh;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+input,textarea,button,select{font-family:var(--sans);outline:none}
+img{max-width:100%;display:block}
+::placeholder{color:rgba(155,149,160,.4)}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:rgba(212,168,83,.2);border-radius:3px}
+
+/* ═══════════════════ UTILITY ═══════════════════ */
+.container{max-width:1120px;margin:0 auto;width:100%}
+.section{padding:90px 24px}
+.text-center{text-align:center}
+.flex-center{display:flex;align-items:center;justify-content:center}
+.gap-8{gap:8px}.gap-10{gap:10px}.gap-12{gap:12px}.gap-14{gap:14px}.gap-16{gap:16px}
+.flex-wrap{flex-wrap:wrap}
+
+/* ═══════════════════ TYPOGRAPHY ═══════════════════ */
+.label{font-family:var(--sans);font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:16px}
+.title{font-family:var(--serif);font-size:clamp(28px,5vw,46px);font-weight:300;line-height:1.2;margin-bottom:16px}
+.gold{color:var(--gold);font-style:italic;font-weight:400}
+.body-text{font-family:var(--sans);font-size:15px;color:var(--muted);line-height:1.7;max-width:500px;margin:0 auto}
+.divider{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:20px auto 0}
+
+/* ═══════════════════ BUTTONS ═══════════════════ */
+.btn-gold{
+  background:linear-gradient(135deg,var(--gold),var(--gold-dk));color:#08060E;border:none;
+  padding:15px 32px;font-family:var(--sans);font-weight:600;font-size:14px;
+  letter-spacing:.4px;border-radius:var(--radius-pill);cursor:pointer;
+  transition:all .3s;display:inline-flex;align-items:center;gap:8px;text-decoration:none;
+}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(212,168,83,.35)}
+.btn-gold.pulse{animation:pulse 2.5s infinite}
+.btn-gold.ghost{background:transparent;color:var(--gold);border:1.5px solid rgba(212,168,83,.4)}
+.btn-gold.ghost:hover{background:rgba(212,168,83,.08);border-color:var(--gold)}
+
+.btn-wa{
+  background:var(--wa);color:#fff;border:none;padding:14px 28px;
+  font-family:var(--sans);font-weight:600;font-size:14px;border-radius:var(--radius-pill);
+  cursor:pointer;transition:all .3s;display:inline-flex;align-items:center;gap:8px;text-decoration:none;
+}
+.btn-wa:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(37,211,102,.3)}
+
+/* ═══════════════════ CARDS ═══════════════════ */
+.card{
+  background:var(--bg-card);border:1px solid rgba(212,168,83,.1);
+  border-radius:var(--radius);transition:all .35s;position:relative;overflow:hidden;
+}
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(212,168,83,.2),transparent);
+}
+.card:hover{border-color:rgba(212,168,83,.25);transform:translateY(-4px);box-shadow:0 16px 50px rgba(0,0,0,.35)}
+.card-body{padding:36px 28px}
+.card-body-sm{padding:24px 22px}
+
+/* ═══════════════════ GRID ═══════════════════ */
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:28px}
+
+/* ═══════════════════ ANIMATIONS ═══════════════════ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(36px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(212,168,83,.3)}50%{box-shadow:0 0 0 14px rgba(212,168,83,0)}}
+@keyframes pulseWa{0%,100%{box-shadow:0 0 0 0 rgba(37,211,102,.3)}50%{box-shadow:0 0 0 14px rgba(37,211,102,0)}}
+@keyframes breathe{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.5}50%{transform:translate(-50%,-50%) scale(1.06);opacity:.8}}
+@keyframes floatP{0%,100%{transform:translateY(0) translateX(0);opacity:.3}50%{transform:translateY(-28px) translateX(8px);opacity:.7}}
+@keyframes gentleRotate{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes counterTick{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.reveal{opacity:0;transform:translateY(36px);transition:all .75s cubic-bezier(.16,1,.3,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+.page-transition{animation:fadeUp .5s cubic-bezier(.16,1,.3,1)}
+
+.shimmer-text{
+  background:linear-gradient(90deg,var(--gold),var(--gold-lt),var(--gold));
+  background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  font-weight:500;font-style:italic;animation:shimmer 4s linear infinite;
+}
+
+/* ═══════════════════ NAVBAR ═══════════════════ */
+.navbar{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  padding:18px 24px;background:rgba(8,6,14,.6);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-bottom:1px solid rgba(212,168,83,.03);transition:all .4s;
+}
+.navbar.scrolled{padding:12px 24px;background:rgba(8,6,14,.94);border-bottom-color:rgba(212,168,83,.08)}
+.nav-inner{display:flex;justify-content:space-between;align-items:center}
+.nav-logo{display:flex;align-items:center;gap:10px;cursor:pointer}
+.nav-logo span{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--gold);letter-spacing:.5px}
+.nav-links{display:flex;gap:32px;align-items:center}
+.nav-link{
+  font-family:var(--sans);font-size:13px;font-weight:400;letter-spacing:.5px;
+  color:var(--muted);cursor:pointer;transition:color .3s;
+  border-bottom:1px solid transparent;padding-bottom:2px;
+}
+.nav-link:hover,.nav-link.active{color:var(--gold)}
+.nav-link.active{border-bottom-color:rgba(212,168,83,.4)}
+.nav-book{padding:10px 26px;font-size:12px}
+.hamburger{
+  display:none;background:none;border:none;color:var(--gold);
+  font-size:22px;cursor:pointer;padding:6px;font-family:var(--sans);font-weight:300;
+}
+.mobile-menu{
+  display:none;position:absolute;top:100%;left:0;right:0;
+  background:rgba(8,6,14,.98);backdrop-filter:blur(20px);
+  padding:20px 24px 28px;border-bottom:1px solid rgba(212,168,83,.08);
+  animation:fadeSlide .3s ease;
+}
+.mobile-menu.open{display:block}
+.mobile-menu .nav-link{display:block;font-size:16px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.mobile-menu-cta{display:flex;gap:10px;margin-top:16px}
+.mobile-menu-cta>*{flex:1;justify-content:center;font-size:13px;padding:12px 16px}
+
+/* ═══════════════════ FLOATING CTA ═══════════════════ */
+.floating-cta{position:fixed;bottom:28px;right:28px;z-index:150;display:flex;flex-direction:column;gap:12px;align-items:flex-end}
+.float-btn{
+  width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  border:none;cursor:pointer;transition:all .3s;box-shadow:0 4px 24px rgba(0,0,0,.3);
+  text-decoration:none;font-size:20px;
+}
+.float-btn:hover{transform:scale(1.1)}
+.float-btn.wa{background:var(--wa);color:#fff;font-size:22px;animation:pulseWa 2.5s infinite}
+.float-btn.call{background:linear-gradient(135deg,var(--gold),var(--gold-dk));color:#08060E}
+
+/* Mobile bottom bar */
+.mobile-bottom{
+  display:none;position:fixed;bottom:0;left:0;right:0;z-index:150;
+  grid-template-columns:1fr 1fr 1fr;
+  background:rgba(8,6,14,.96);backdrop-filter:blur(20px);
+  border-top:1px solid rgba(212,168,83,.1);padding:8px 6px;
+}
+.mobile-bottom a{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:8px 0;border-radius:12px;text-decoration:none;
+  font-family:var(--sans);font-size:10px;font-weight:500;letter-spacing:.5px;cursor:pointer;
+}
+.mobile-bottom .book-btn{background:linear-gradient(135deg,var(--gold),var(--gold-dk));color:#08060E;font-weight:600}
+.mobile-bottom .wa-link{color:var(--wa)}
+.mobile-bottom .call-link{color:var(--gold)}
+
+/* ═══════════════════ HERO PARTICLES ═══════════════════ */
+.particles{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.particle{
+  position:absolute;border-radius:50%;
+  animation:floatP var(--dur) ease-in-out infinite;
+  animation-delay:var(--delay);
+}
+.hero-orb{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle,rgba(75,0,130,.15),transparent 70%);
+  animation:breathe 8s ease-in-out infinite;pointer-events:none;
+}
+.orbit-ring{
+  position:absolute;top:20%;right:10%;width:200px;height:200px;border-radius:50%;
+  border:1px solid rgba(212,168,83,.06);animation:gentleRotate 30s linear infinite;pointer-events:none;
+}
+.orbit-dot{position:absolute;top:-3px;left:50%;width:6px;height:6px;border-radius:50%;background:rgba(212,168,83,.3)}
+
+/* ═══════════════════ SPECIFIC SECTIONS ═══════════════════ */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:60px 24px}
+.hero-content{text-align:center;position:relative;z-index:2;max-width:780px}
+.hero h1{font-family:var(--serif);font-size:clamp(34px,7vw,66px);font-weight:300;line-height:1.12;margin-bottom:28px}
+.hero-sub{font-family:var(--sans);font-size:clamp(14px,2vw,17px);color:var(--muted);max-width:500px;margin:0 auto 40px;line-height:1.75;font-weight:300}
+.hero-tags{font-family:var(--sans);font-size:11px;color:rgba(155,149,160,.5);margin-top:22px}
+
+.stat-strip{display:flex;justify-content:center;gap:clamp(30px,6vw,80px);flex-wrap:wrap;text-align:center}
+.stat-num{font-family:var(--serif);font-size:clamp(26px,4vw,36px);color:var(--gold);font-weight:500}
+.stat-label{font-family:var(--sans);font-size:11px;color:var(--muted);letter-spacing:1px;margin-top:4px}
+
+.icon-box{font-size:32px;width:52px;height:52px;display:flex;align-items:center;justify-content:center;background:rgba(212,168,83,.06);border-radius:14px;margin-bottom:16px}
+.step-num{font-family:var(--serif);font-size:60px;font-weight:300;color:rgba(212,168,83,.06);position:absolute;top:6px;left:50%;transform:translateX(-50%)}
+
+.badge{
+  font-family:var(--sans);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;
+  padding:5px 12px;border-radius:20px;display:inline-block;
+}
+.badge-gold{color:var(--gold);background:rgba(212,168,83,.1);border:1px solid rgba(212,168,83,.2)}
+.badge-green{color:var(--wa);background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.2)}
+
+.plan-price{font-family:var(--serif);font-size:38px;color:var(--gold);font-weight:500}
+.plan-per{font-family:var(--sans);font-size:12px;color:var(--muted)}
+.plan-session{font-family:var(--sans);font-size:12px;color:var(--wa)}
+
+.feature-item{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start}
+.feature-dot{color:var(--gold);font-size:11px;margin-top:3px;flex-shrink:0}
+.feature-text{font-family:var(--sans);font-size:13px;color:rgba(232,228,221,.75);line-height:1.5}
+
+.testimonial-service{font-family:var(--sans);font-size:11px;color:var(--gold);background:rgba(212,168,83,.08);padding:4px 10px;border-radius:8px}
+.avatar{
+  width:40px;height:40px;border-radius:50%;
+  background:linear-gradient(135deg,var(--purple-mid),rgba(212,168,83,.2));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:16px;color:var(--gold);font-weight:600;flex-shrink:0;
+}
+.quote{font-family:var(--serif);font-size:16px;line-height:1.8;font-style:italic;font-weight:300;color:rgba(232,228,221,.85)}
+
+/* Booking */
+.progress-bar{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:40px 0 48px}
+.progress-step{display:flex;align-items:center;gap:8px}
+.progress-circle{
+  width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--sans);font-size:12px;font-weight:600;transition:all .3s;
+}
+.progress-circle.done{background:var(--gold);color:#08060E}
+.progress-circle.active{background:rgba(212,168,83,.15);color:var(--gold);border:1px solid rgba(212,168,83,.4)}
+.progress-circle.pending{background:rgba(255,255,255,.04);color:var(--muted);border:1px solid transparent}
+.progress-label{font-family:var(--sans);font-size:12px}
+.progress-line{width:24px;height:1px;background:rgba(212,168,83,.15);margin:0 4px}
+
+.choice-chip{
+  padding:10px 18px;border-radius:20px;cursor:pointer;
+  font-family:var(--sans);font-size:13px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);
+  color:var(--muted);transition:all .2s;display:inline-block;margin:0 8px 8px 0;
+}
+.choice-chip.selected{background:rgba(212,168,83,.15);border-color:rgba(212,168,83,.4);color:var(--gold)}
+
+.date-chip{
+  padding:14px 18px;border-radius:14px;cursor:pointer;text-align:center;min-width:80px;
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);transition:all .2s;
+}
+.date-chip.selected{background:rgba(212,168,83,.15);border-color:rgba(212,168,83,.4)}
+.date-chip.selected *{color:var(--gold)!important}
+
+.time-chip{
+  padding:12px;border-radius:10px;cursor:pointer;text-align:center;
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);
+  font-family:var(--sans);font-size:13px;color:var(--muted);transition:all .2s;
+}
+.time-chip.selected{background:rgba(212,168,83,.15);border-color:rgba(212,168,83,.4);color:var(--gold)}
+
+.form-input{
+  width:100%;padding:14px 18px;border-radius:var(--radius-sm);
+  background:rgba(255,255,255,.04);border:1px solid rgba(212,168,83,.12);
+  color:var(--text);font-size:14px;transition:border-color .3s;
+}
+.form-input:focus{border-color:rgba(212,168,83,.4)}
+
+.confirm-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.confirm-row:last-child{border-bottom:none}
+
+/* FAQ */
+.faq-item{border-bottom:1px solid rgba(212,168,83,.08);padding:20px 0;cursor:pointer}
+.faq-q{display:flex;justify-content:space-between;align-items:center;font-family:var(--sans);font-size:15px;font-weight:500}
+.faq-toggle{color:var(--gold);font-size:20px;transition:transform .3s}
+.faq-toggle.open{transform:rotate(45deg)}
+.faq-a{font-family:var(--sans);font-size:14px;color:var(--muted);line-height:1.7;margin-top:12px;padding-right:30px;animation:fadeSlide .3s ease;display:none}
+.faq-a.open{display:block}
+
+/* Contact */
+.contact-card{display:flex;gap:16px;align-items:center;text-decoration:none;color:inherit}
+.contact-icon{font-size:28px;width:52px;height:52px;display:flex;align-items:center;justify-content:center;background:rgba(212,168,83,.06);border-radius:14px;flex-shrink:0}
+
+/* Service expand */
+.service-expand{display:none;animation:fadeSlide .4s ease;margin-top:20px}
+.service-expand.open{display:block}
+
+/* ═══════════════════ RESPONSIVE ═══════════════════ */
+@media(max-width:768px){
+  .nav-links{display:none!important}
+  .hamburger{display:block!important}
+  .floating-cta{display:none!important}
+  .mobile-bottom{display:grid!important}
+  .mobile-menu{display:none}
+  .mobile-menu.open{display:block}
+  .section{padding:70px 18px}
+  .desk-only{display:none!important}
+  body{padding-bottom:72px}
+  .grid-4{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+}
+@media(min-width:769px){
+  .mob-only{display:none!important}
+  .hamburger{display:none}
+  .mobile-menu{display:none!important}
+  .mobile-bottom{display:none!important}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ NAVBAR ═══════════════════ -->
+<nav class="navbar" id="navbar">
+  <div class="container nav-inner">
+    <div class="nav-logo" onclick="navigate('home')">
+      <svg width="26" height="26" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="18" stroke="#D4A853" stroke-width="1" fill="none" opacity=".4"/><path d="M28 6C20 10 16 18 16 24s4 14 12 18c-1.5.3-3 .5-4.5.5C13 42.5 4.5 34 4.5 23.5S13 4.5 23.5 4.5c1.5 0 3 .2 4.5.5z" fill="#D4A853" opacity=".7"/></svg>
+      <span>Aanya Sharma</span>
+    </div>
+    <div class="nav-links" id="navLinks">
+      <span class="nav-link active" data-route="home" onclick="navigate('home')">Home</span>
+      <span class="nav-link" data-route="services" onclick="navigate('services')">Services</span>
+      <span class="nav-link" data-route="pricing" onclick="navigate('pricing')">Pricing</span>
+      <span class="nav-link" data-route="about" onclick="navigate('about')">About</span>
+      <span class="nav-link" data-route="testimonials" onclick="navigate('testimonials')">Testimonials</span>
+      <span class="nav-link" data-route="contact" onclick="navigate('contact')">Contact</span>
+      <a class="btn-gold nav-book" onclick="navigate('booking')" style="cursor:pointer">Book Now</a>
+    </div>
+    <button class="hamburger" id="hamburger" onclick="toggleMenu()">☰</button>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <span class="nav-link" onclick="navigate('home');toggleMenu()">Home</span>
+    <span class="nav-link" onclick="navigate('services');toggleMenu()">Services</span>
+    <span class="nav-link" onclick="navigate('pricing');toggleMenu()">Pricing</span>
+    <span class="nav-link" onclick="navigate('about');toggleMenu()">About</span>
+    <span class="nav-link" onclick="navigate('testimonials');toggleMenu()">Testimonials</span>
+    <span class="nav-link" onclick="navigate('contact');toggleMenu()">Contact</span>
+    <div class="mobile-menu-cta">
+      <a href="https://wa.me/919876543210?text=Hi%2C%20I'd%20like%20to%20book%20a%20reading" class="btn-wa">💬 WhatsApp</a>
+      <a href="tel:+919876543210" class="btn-gold ghost">📞 Call</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════ FLOATING CTA (DESKTOP) ═══════════════════ -->
+<div class="floating-cta" id="floatingCta">
+  <a href="tel:+919876543210" class="float-btn call">📞</a>
+  <a href="https://wa.me/919876543210?text=Hi%2C%20I'd%20like%20to%20book%20a%20reading" class="float-btn wa">💬</a>
+</div>
+
+<!-- ═══════════════════ MOBILE BOTTOM BAR ═══════════════════ -->
+<div class="mobile-bottom">
+  <a href="https://wa.me/919876543210?text=Hi%2C%20I'd%20like%20to%20book%20a%20reading" class="wa-link"><span style="font-size:18px">💬</span>WhatsApp</a>
+  <a href="tel:+919876543210" class="call-link"><span style="font-size:18px">📞</span>Call</a>
+  <a class="book-btn" onclick="navigate('booking')"><span style="font-size:18px">✦</span>Book</a>
+</div>
+
+<!-- ═══════════════════ MAIN CONTENT ═══════════════════ -->
+<main id="app"></main>
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer style="border-top:1px solid rgba(212,168,83,.06);padding:60px 24px 36px">
+  <div class="container">
+    <div class="grid-4" style="margin-bottom:48px">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+          <svg width="20" height="20" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="18" stroke="#D4A853" stroke-width="1" fill="none" opacity=".4"/><path d="M28 6C20 10 16 18 16 24s4 14 12 18c-1.5.3-3 .5-4.5.5C13 42.5 4.5 34 4.5 23.5S13 4.5 23.5 4.5c1.5 0 3 .2 4.5.5z" fill="#D4A853" opacity=".7"/></svg>
+          <span style="font-family:var(--serif);font-size:18px;color:var(--gold)">Aanya Sharma</span>
+        </div>
+        <p style="font-family:var(--sans);font-size:13px;color:var(--muted);line-height:1.7">Intuitive tarot guidance for love, career, and life's crossroads. Available 10 AM – 9 PM IST.</p>
+      </div>
+      <div>
+        <p style="font-family:var(--sans);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px">Navigate</p>
+        <p style="font-family:var(--sans);font-size:13px;color:var(--muted);margin-bottom:10px;cursor:pointer" onclick="navigate('home')">Home</p>
+        <p style="font-family:var(--sans);font-size:13px;color:var(--muted);margin-bottom:10px;cursor:pointer" onclick="navigate('services')">Services</p>
+        <p style="font-family:var(--sans);font-size:13px;color:var(--muted);margin-bottom:10px;cursor:pointer" onclick="navigate('pricing')">Pricing</p>
+        <p style="font-family:var(--sans);font-size:13px;color:var(--muted);margin-bottom:10px;cursor:pointer" onclick="navigate('about')">About</p>
+      </div>
+      <div>
+        <p style="font-family:var(--sans);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px">Connect</p>
+        <p style="font-family:var(--sans);font-size:13px;color:var(--muted);margin-bottom:10px;cursor:pointer" onclick="navigate('testimonials')">Testimonials</p>
+        <p style="font-family:var(--sans);font-size:13px;color:var(--muted);margin-bottom:10px;cursor:pointer" onclick="navigate('contact')">Contact</p>
+        <p style="font-family:var(--sans);font-size:13px;color:var(--muted);margin-bottom:10px;cursor:pointer" onclick="navigate('booking')">Book a Session</p>
+      </div>
+      <div>
+        <p style="font-family:var(--sans);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px">Quick Contact</p>
+        <a href="https://wa.me/919876543210" style="font-family:var(--sans);font-size:13px;color:var(--muted);display:block;margin-bottom:10px">💬 WhatsApp</a>
+        <a href="tel:+919876543210" style="font-family:var(--sans);font-size:13px;color:var(--muted);display:block;margin-bottom:10px">📞 +91 98765 43210</a>
+        <p style="font-family:var(--sans);font-size:13px;color:var(--muted)">✉ hello@aanyasharma.com</p>
+      </div>
+    </div>
+    <div style="border-top:1px solid rgba(212,168,83,.06);padding-top:24px;text-align:center">
+      <p style="font-family:var(--sans);font-size:11px;color:rgba(155,149,160,.4)">© 2026 Aanya Sharma. All readings are for guidance purposes only and not a substitute for professional advice.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ═══════════════════ DATA ═══════════════════
+const WA = "https://wa.me/919876543210?text=Hi%2C%20I'd%20like%20to%20book%20a%20reading";
+const PH = "tel:+919876543210";
+
+const PLANS = [
+  { id:"quick", name:"Quick Insight", price:499, duration:"15 min", badge:null, desc:"Perfect when you need a quick answer to one burning question.", features:["Chat or Call","1 focused question","Instant clarity & insight","Summary via WhatsApp"] },
+  { id:"soul", name:"Soul Guidance", price:1199, duration:"30 min", badge:"Most Chosen", desc:"Our most popular reading — deep, detailed, and transformative.", features:["Call + Chat","Up to 3 questions","Detailed card-by-card reading","Actionable advice & timeline","Written summary included"] },
+  { id:"elite", name:"Elite Clarity", price:2999, duration:"60 min", badge:null, desc:"The ultimate deep-dive for major life transitions and crossroads.", features:["Priority Call slot","Unlimited questions","Complete life guidance","Personalized roadmap","Follow-up support (7 days)","Recorded session notes"] },
+  { id:"monthly", name:"Monthly Support", price:3499, duration:"4 sessions/mo", badge:"Best Value", perSession:"₹875/session", desc:"Continuous guidance for those navigating an ongoing journey.", features:["4 sessions per month (10–15 min)","Quick call access anytime","WhatsApp support between sessions","Priority booking","Ongoing guidance & check-ins"] }
+];
+
+const SERVICES = [
+  { id:"love", icon:"♡", title:"Love & Relationships", short:"Clarity on romance, compatibility, and emotional patterns.", full:"Whether you're navigating a new connection, healing from heartbreak, or seeking clarity about your partner, this reading illuminates the energy surrounding your love life. We explore compatibility, hidden dynamics, timing, and the path that serves your highest good.", includes:["Current relationship energy","Partner's feelings & intentions","Compatibility insights","Timeline & guidance"] },
+  { id:"career", icon:"◈", title:"Career & Finance", short:"Navigate professional crossroads with cosmic confidence.", full:"At a career crossroads? Considering a switch? Waiting on a promotion? This reading brings clarity to your professional energy — what's aligned, what's blocking you, and when to make your move.", includes:["Career path alignment","Timing for decisions","Financial energy reading","Opportunity identification"] },
+  { id:"life", icon:"✧", title:"Life Path & Purpose", short:"Understand your bigger picture and soul's direction.", full:"This comprehensive reading goes beyond specific questions to explore the broader arc of your life. We look at your soul's purpose, current life cycle, karmic patterns, and what the universe is preparing you for.", includes:["Soul purpose exploration","Current life cycle analysis","Karmic pattern insights","Future trajectory reading"] },
+  { id:"general", icon:"☽", title:"General Guidance", short:"Open reading for any question or situation in your life.", full:"Not sure which category fits? This open-ended reading is guided entirely by your energy and whatever questions arise. Whether it's family, health, decisions, or simply 'what do I need to know right now?'", includes:["Open-ended card pull","Energy assessment","Guidance on any topic","Clarity & next steps"] }
+];
+
+const TESTIMONIALS = [
+  { name:"Priya M.", loc:"Mumbai", text:"I was spiralling about my relationship for months. One session gave me the clarity I desperately needed. She predicted things that actually happened three weeks later. I'm genuinely amazed.", service:"Love Reading", avatar:"P" },
+  { name:"Rahul S.", loc:"Bangalore", text:"Started as a total skeptic — my wife pushed me to try it. The career reading was so accurate it gave me chills. Made the job switch she suggested and it was the best decision of my professional life.", service:"Career Reading", avatar:"R" },
+  { name:"Ananya K.", loc:"Delhi", text:"She doesn't just read cards — she reads your energy. I've had 4 sessions now and each one has been incredibly precise. It's like talking to someone who genuinely understands your soul.", service:"Life Path", avatar:"A" },
+  { name:"Vikram T.", loc:"Pune", text:"Reached out during the darkest phase of my life. Her reading gave me both hope and a concrete roadmap. Three months later, things shifted exactly as she described. Forever grateful.", service:"General Reading", avatar:"V" },
+  { name:"Meera J.", loc:"Hyderabad", text:"The monthly plan is a game-changer. Having ongoing guidance as things unfold in real-time has been incredibly valuable. She remembers your story and tracks your progress.", service:"Monthly Support", avatar:"M" },
+  { name:"Arjun D.", loc:"Chennai", text:"I was deciding between two job offers and couldn't sleep for days. Aanya's reading cut through all the noise. She pinpointed exactly which one aligned with my energy. She was right.", service:"Career Reading", avatar:"A" }
+];
+
+const FAQS = [
+  { q:"How does an online tarot reading work?", a:"We connect via WhatsApp call or video call. I tune into your energy, pull cards specific to your question, and walk you through the insights in real-time. It's just as powerful as in-person." },
+  { q:"Do I need to believe in tarot for it to work?", a:"Not at all. Tarot works with energy, not belief systems. Many of my most satisfied clients started as complete skeptics. The cards speak regardless." },
+  { q:"How accurate are the readings?", a:"Tarot reveals the most probable outcome based on your current energy. While free will always plays a role, my clients consistently report 85-90% accuracy." },
+  { q:"Is everything I share confidential?", a:"Absolutely. Your reading is a sacred, private space. I never share details of any session with anyone. Your trust is the foundation of this work." }
+];
+
+// ═══════════════════ ROUTING ═══════════════════
+let currentRoute = 'home';
+let routeParams = {};
+let bookingState = { plan:null, service:null, date:null, time:null, step:1, form:{name:'',phone:'',email:'',question:''} };
+
+function navigate(route, params = {}) {
+  document.getElementById('app').style.opacity = '0';
+  document.getElementById('app').style.transform = 'translateY(16px)';
+  setTimeout(() => {
+    currentRoute = route;
+    routeParams = params;
+    if (route === 'booking') {
+      if (params.plan) bookingState.plan = params.plan;
+      if (params.service) bookingState.service = params.service;
+      bookingState.step = 1;
+    }
+    renderPage();
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    updateNavLinks();
+    setTimeout(() => {
+      document.getElementById('app').style.opacity = '1';
+      document.getElementById('app').style.transform = 'translateY(0)';
+    }, 50);
+  }, 250);
+}
+
+function updateNavLinks() {
+  document.querySelectorAll('.nav-link').forEach(l => {
+    l.classList.toggle('active', l.dataset.route === currentRoute);
+  });
+}
+
+function toggleMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const btn = document.getElementById('hamburger');
+  menu.classList.toggle('open');
+  btn.textContent = menu.classList.contains('open') ? '✕' : '☰';
+}
+
+// ═══════════════════ SCROLL HANDLING ═══════════════════
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+});
+
+// ═══════════════════ INTERSECTION OBSERVER ═══════════════════
+function initReveal() {
+  const els = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold: 0.12 });
+  els.forEach(el => obs.observe(el));
+}
+
+// ═══════════════════ HELPERS ═══════════════════
+function stars() {
+  return '<div style="display:flex;gap:2px">' + Array(5).fill('<svg width="13" height="13" viewBox="0 0 24 24" fill="#D4A853"><polygon points="12,2 15,9 22,9.5 17,14.5 18.5,22 12,18 5.5,22 7,14.5 2,9.5 9,9"/></svg>').join('') + '</div>';
+}
+
+function particles(count=15) {
+  let html = '';
+  for(let i=0;i<count;i++){
+    const s = Math.random()*3+1;
+    html += `<div class="particle" style="width:${s}px;height:${s}px;background:rgba(212,168,83,${Math.random()*.35+.1});left:${Math.random()*100}%;top:${Math.random()*100}%;--dur:${Math.random()*6+4}s;--delay:${Math.random()*4}s"></div>`;
+  }
+  return `<div class="particles">${html}</div>`;
+}
+
+function planCard(p, featured) {
+  const badgeHtml = p.badge ? `<span class="badge ${p.badge==='Best Value'?'badge-green':'badge-gold'}" style="position:absolute;top:16px;right:16px">${p.badge}</span>` : '';
+  const perSession = p.perSession ? `<p class="plan-session">${p.perSession}</p>` : '';
+  const features = p.features.map(f => `<div class="feature-item"><span class="feature-dot">✦</span><span class="feature-text">${f}</span></div>`).join('');
+  const btnStyle = featured ? '' : 'background:transparent;color:var(--gold);border:1.5px solid rgba(212,168,83,.4)';
+  return `
+    <div class="card" style="${featured?'border-color:rgba(212,168,83,.35);background:linear-gradient(145deg,rgba(45,27,78,.5),rgba(10,10,15,.8))':''}">
+      <div class="card-body" style="position:relative">
+        ${badgeHtml}
+        <p style="font-family:var(--sans);font-size:12px;color:var(--muted);letter-spacing:1px;margin-bottom:6px">${p.duration}</p>
+        <h3 style="font-family:var(--serif);font-size:24px;font-weight:500;margin-bottom:8px">${p.name}</h3>
+        <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:4px">
+          <span class="plan-price">₹${p.price.toLocaleString()}</span>
+          <span class="plan-per">${p.id==='monthly'?'/month':'/session'}</span>
+        </div>
+        ${perSession}
+        <p style="font-family:var(--sans);font-size:13px;color:var(--muted);line-height:1.6;margin:12px 0 20px">${p.desc}</p>
+        <div style="border-top:1px solid rgba(212,168,83,.08);padding-top:18px;margin-bottom:24px">${features}</div>
+        <a class="btn-gold" onclick="navigate('booking',{plan:'${p.id}'})" style="width:100%;justify-content:center;cursor:pointer;${btnStyle}">Select Plan →</a>
+      </div>
+    </div>`;
+}
+
+function testimonialCard(t) {
+  return `
+    <div class="card">
+      <div class="card-body">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          ${stars()}
+          <span class="testimonial-service">${t.service}</span>
+        </div>
+        <p class="quote" style="margin-bottom:22px">"${t.text}"</p>
+        <div style="display:flex;align-items:center;gap:12px;border-top:1px solid rgba(212,168,83,.06);padding-top:16px">
+          <div class="avatar">${t.avatar}</div>
+          <div>
+            <p style="font-family:var(--sans);font-size:13px;font-weight:500">${t.name}</p>
+            <p style="font-family:var(--sans);font-size:11px;color:var(--muted)">${t.loc}</p>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ═══════════════════ PAGE RENDERERS ═══════════════════
+function renderPage() {
+  const pages = { home:renderHome, services:renderServices, pricing:renderPricing, booking:renderBooking, about:renderAbout, testimonials:renderTestimonials, contact:renderContact };
+  const renderer = pages[currentRoute] || renderHome;
+  document.getElementById('app').innerHTML = renderer();
+  setTimeout(initReveal, 100);
+}
+
+// ─────────── HOME ───────────
+function renderHome() {
+  return `
+  <section class="hero">
+    <div class="hero-orb"></div>
+    <div class="orbit-ring desk-only"><div class="orbit-dot"></div></div>
+    ${particles()}
+    <div class="hero-content">
+      <p class="reveal label" style="margin-bottom:28px">✧ Trusted by 2,000+ Clients Across India ✧</p>
+      <h1 class="reveal" style="transition-delay:.15s">The Answers You Seek<br><span class="shimmer-text">Are Already Within You</span></h1>
+      <p class="reveal hero-sub" style="transition-delay:.3s">Intuitive tarot guidance for love, career, and life's biggest crossroads — delivered with honesty, depth, and care.</p>
+      <div class="reveal flex-center flex-wrap gap-14" style="transition-delay:.45s">
+        <a class="btn-gold" onclick="navigate('booking')" style="cursor:pointer">Book Your Reading →</a>
+        <a href="${WA}" class="btn-wa">💬 Chat on WhatsApp</a>
+      </div>
+      <p class="reveal hero-tags" style="transition-delay:.6s">✓ 100% Confidential &nbsp;·&nbsp; ✓ 10 AM – 9 PM IST &nbsp;·&nbsp; ✓ English & Hindi</p>
+    </div>
+  </section>
+
+  <div class="section" style="padding-top:50px;padding-bottom:50px;background:linear-gradient(180deg,rgba(26,10,46,.25),transparent)">
+    <div class="container reveal">
+      <div class="stat-strip">
+        <div><p class="stat-num">2,000+</p><p class="stat-label">Readings Done</p></div>
+        <div><p class="stat-num">7+</p><p class="stat-label">Years Experience</p></div>
+        <div><p class="stat-num">4.9★</p><p class="stat-label">Client Rating</p></div>
+        <div><p class="stat-num">98%</p><p class="stat-label">Would Recommend</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section"><div class="container">
+    <div class="reveal text-center"><p class="label">✧ What I Offer</p><h2 class="title">Guidance Tailored to <span class="gold">Your Journey</span></h2><div class="divider"></div></div>
+    <div class="grid-3" style="margin-top:56px">
+      ${SERVICES.slice(0,3).map((s,i) => `
+        <div class="card reveal" style="cursor:pointer;transition-delay:${i*.12}s" onclick="navigate('services',{highlight:'${s.id}'})">
+          <div class="card-body">
+            <div class="icon-box">${s.icon}</div>
+            <h3 style="font-family:var(--serif);font-size:22px;font-weight:500;margin-bottom:10px">${s.title}</h3>
+            <p style="font-family:var(--sans);font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:18px">${s.short}</p>
+            <span style="font-family:var(--sans);font-size:13px;color:var(--gold)">Learn more →</span>
+          </div>
+        </div>`).join('')}
+    </div>
+    <div class="reveal text-center" style="margin-top:36px;transition-delay:.4s">
+      <a class="btn-gold ghost" onclick="navigate('services')" style="cursor:pointer">View All Services</a>
+    </div>
+  </div></div>
+
+  <div class="section" style="background:linear-gradient(180deg,rgba(26,10,46,.2),transparent)"><div class="container">
+    <div class="reveal text-center"><p class="label">✧ Simple Process</p><h2 class="title">Your Reading in <span class="gold">3 Steps</span></h2><div class="divider"></div></div>
+    <div class="grid-3" style="margin-top:56px;max-width:880px;margin-left:auto;margin-right:auto">
+      ${[
+        {s:'01',t:'Reach Out',d:'Message me on WhatsApp or call. Share what you need guidance on.',ic:'💬'},
+        {s:'02',t:'We Connect',d:'We schedule a convenient time. Sessions happen via call or video — wherever you\'re most comfortable.',ic:'🔮'},
+        {s:'03',t:'Receive Clarity',d:'I pull cards, channel insights, and give you actionable guidance. You leave with clarity and direction.',ic:'✨'}
+      ].map((s,i) => `
+        <div class="reveal text-center" style="padding:36px 20px;position:relative;transition-delay:${i*.15}s">
+          <div class="step-num">${s.s}</div>
+          <div style="font-size:34px;margin-bottom:18px;position:relative">${s.ic}</div>
+          <h3 style="font-family:var(--serif);font-size:20px;font-weight:500;margin-bottom:10px;position:relative">${s.t}</h3>
+          <p style="font-family:var(--sans);font-size:13px;color:var(--muted);line-height:1.7;position:relative">${s.d}</p>
+        </div>`).join('')}
+    </div>
+    <div class="reveal text-center" style="margin-top:40px;transition-delay:.5s">
+      <a href="${WA}" class="btn-wa" style="font-size:15px;padding:16px 36px">💬 Message Me on WhatsApp</a>
+      <p style="font-family:var(--sans);font-size:12px;color:var(--muted);margin-top:12px">Usually responds within 30 minutes</p>
+    </div>
+  </div></div>
+
+  <div class="section"><div class="container">
+    <div class="reveal text-center"><p class="label">✧ Real Stories</p><h2 class="title">Trusted by People Like <span class="gold">You</span></h2><div class="divider"></div></div>
+    <div class="grid-3" style="margin-top:48px">
+      ${TESTIMONIALS.slice(0,3).map((t,i) => `<div class="reveal" style="transition-delay:${i*.1}s">${testimonialCard(t)}</div>`).join('')}
+    </div>
+    <div class="reveal text-center" style="margin-top:32px;transition-delay:.35s">
+      <a class="btn-gold ghost" onclick="navigate('testimonials')" style="cursor:pointer">Read All Reviews →</a>
+    </div>
+  </div></div>
+
+  <div class="section" style="padding-bottom:120px"><div class="container">
+    <div class="reveal text-center" style="max-width:600px;margin:0 auto;padding:56px 36px;border-radius:24px;background:linear-gradient(145deg,rgba(45,27,78,.35),rgba(10,10,15,.6));border:1px solid rgba(212,168,83,.12);position:relative;overflow:hidden">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(75,0,130,.15),transparent 70%);pointer-events:none"></div>
+      ${particles(8)}
+      <div style="position:relative;z-index:1">
+        <h2 class="title">Ready for <span class="gold">Clarity</span>?</h2>
+        <p style="font-family:var(--sans);font-size:15px;color:var(--muted);max-width:400px;margin:8px auto 32px;line-height:1.7">Stop overthinking. Your first step toward answers is just a message away.</p>
+        <div class="flex-center flex-wrap gap-14">
+          <a class="btn-gold pulse" onclick="navigate('booking')" style="cursor:pointer">Book Session →</a>
+          <a href="${WA}" class="btn-wa">💬 WhatsApp Me</a>
+        </div>
+        <p style="font-family:var(--sans);font-size:11px;color:rgba(155,149,160,.45);margin-top:18px">Available 10 AM – 9 PM IST · Usually responds within 30 min</p>
+      </div>
+    </div>
+  </div></div>`;
+}
+
+// ─────────── SERVICES ───────────
+function renderServices() {
+  const highlight = routeParams.highlight || null;
+  return `<div class="section page-transition"><div class="container">
+    <div class="reveal text-center"><p class="label">✧ Services</p><h2 class="title">Choose Your <span class="gold">Reading</span></h2><p class="body-text" style="margin-top:12px">Every session is a private, one-on-one experience tailored to your specific questions and energy.</p><div class="divider"></div></div>
+    <div class="grid-2" style="margin-top:56px">
+      ${SERVICES.map((s,i) => `
+        <div class="card reveal" style="cursor:pointer;transition-delay:${i*.1}s" onclick="toggleService('${s.id}')" id="svc-${s.id}">
+          <div class="card-body">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div class="icon-box">${s.icon}</div>
+              <span id="svc-toggle-${s.id}" style="font-family:var(--sans);font-size:18px;color:var(--gold);transition:transform .3s${highlight===s.id?';transform:rotate(45deg)':''}">+</span>
+            </div>
+            <h3 style="font-family:var(--serif);font-size:24px;font-weight:500;margin-bottom:10px">${s.title}</h3>
+            <p style="font-family:var(--sans);font-size:14px;color:var(--muted);line-height:1.7" id="svc-desc-${s.id}">${highlight===s.id?s.full:s.short}</p>
+            <div class="service-expand ${highlight===s.id?'open':''}" id="svc-exp-${s.id}">
+              <p style="font-family:var(--sans);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:12px">Includes</p>
+              ${s.includes.map(inc => `<div class="feature-item"><span class="feature-dot">✦</span><span class="feature-text">${inc}</span></div>`).join('')}
+              <div style="margin-top:20px">
+                <a class="btn-gold" onclick="event.stopPropagation();navigate('booking',{service:'${s.id}'})" style="cursor:pointer;font-size:13px;padding:12px 24px">Book This Reading →</a>
+              </div>
+            </div>
+          </div>
+        </div>`).join('')}
+    </div>
+    <div class="reveal text-center" style="margin-top:56px;transition-delay:.4s">
+      <div class="card" style="padding:40px 28px;background:linear-gradient(145deg,rgba(45,27,78,.2),rgba(10,10,15,.4))">
+        <p style="font-family:var(--serif);font-size:22px;font-weight:400;margin-bottom:8px">Not sure which reading is right for you?</p>
+        <p style="font-family:var(--sans);font-size:14px;color:var(--muted);margin-bottom:20px">Send me a message and I'll help you find the perfect fit.</p>
+        <a href="${WA}" class="btn-wa" style="font-size:14px">💬 Ask Me on WhatsApp</a>
+      </div>
+    </div>
+  </div></div>`;
+}
+
+function toggleService(id) {
+  const exp = document.getElementById('svc-exp-' + id);
+  const toggle = document.getElementById('svc-toggle-' + id);
+  const desc = document.getElementById('svc-desc-' + id);
+  const svc = SERVICES.find(s => s.id === id);
+  const isOpen = exp.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.service-expand').forEach(el => el.classList.remove('open'));
+  document.querySelectorAll('[id^="svc-toggle-"]').forEach(el => el.style.transform = 'none');
+  SERVICES.forEach(s => { const d = document.getElementById('svc-desc-'+s.id); if(d) d.textContent = s.short; });
+  if (!isOpen) {
+    exp.classList.add('open');
+    toggle.style.transform = 'rotate(45deg)';
+    desc.textContent = svc.full;
+  }
+}
+
+// ─────────── PRICING ───────────
+function renderPricing() {
+  return `<div class="section page-transition"><div class="container">
+    <div class="reveal text-center"><p class="label">✧ Pricing</p><h2 class="title">Simple, Transparent <span class="gold">Plans</span></h2><p class="body-text" style="margin-top:12px">Choose the level of guidance that suits your needs. No hidden fees, no upselling — just clarity.</p><div class="divider"></div></div>
+    <div class="grid-4" style="margin-top:56px">
+      ${PLANS.map((p,i) => `<div class="reveal" style="transition-delay:${i*.1}s">${planCard(p, p.id==='soul')}</div>`).join('')}
+    </div>
+    <div class="reveal text-center" style="margin-top:56px;transition-delay:.5s">
+      <p style="font-family:var(--sans);font-size:14px;color:var(--muted)">Not sure? Start with <span style="color:var(--gold);cursor:pointer" onclick="navigate('booking',{plan:'quick'})">Quick Insight (₹499)</span> — risk-free clarity.</p>
+      <p style="font-family:var(--sans);font-size:12px;color:rgba(155,149,160,.4);margin-top:8px">All sessions include a written summary via WhatsApp</p>
+    </div>
+  </div></div>`;
+}
+
+// ─────────── BOOKING ───────────
+function renderBooking() {
+  const st = bookingState;
+  const dates = [];
+  for(let i=1;i<=7;i++){
+    const d=new Date();d.setDate(d.getDate()+i);
+    dates.push({ label:d.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'}), value:d.toISOString().split('T')[0] });
+  }
+  const times = ["10:00 AM","11:00 AM","12:00 PM","2:00 PM","3:00 PM","4:00 PM","5:00 PM","6:00 PM","7:00 PM","8:00 PM"];
+  const steps = ["Select Plan","Pick Slot","Your Details","Confirm"];
+
+  let stepContent = '';
+
+  if (st.step === 1) {
+    stepContent = `
+      <div class="grid-2" style="gap:16px">
+        ${PLANS.map(p => `
+          <div class="card" onclick="selectPlan('${p.id}')" id="bp-${p.id}" style="cursor:pointer;${st.plan===p.id?'border-color:rgba(212,168,83,.4);background:linear-gradient(145deg,rgba(45,27,78,.4),rgba(10,10,15,.7))':''}">
+            <div class="card-body-sm">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <h4 style="font-family:var(--serif);font-size:18px;font-weight:500">${p.name}</h4>
+                ${p.badge?`<span class="badge badge-gold" style="font-size:8px">${p.badge}</span>`:''}
+              </div>
+              <p style="font-family:var(--sans);font-size:12px;color:var(--muted);margin-bottom:8px">${p.duration}</p>
+              <p style="font-family:var(--serif);font-size:26px;color:var(--gold);font-weight:500">₹${p.price.toLocaleString()}</p>
+              ${st.plan===p.id?'<div style="width:100%;height:2px;background:var(--gold);border-radius:1px;margin-top:12px"></div>':''}
+            </div>
+          </div>`).join('')}
+      </div>
+      ${st.plan ? `
+        <div style="margin-top:20px">
+          <p style="font-family:var(--sans);font-size:12px;color:var(--muted);margin-bottom:12px">What area do you need guidance on?</p>
+          <div>${SERVICES.map(s => `<span class="choice-chip ${st.service===s.id?'selected':''}" onclick="selectService('${s.id}')">${s.icon} ${s.title}</span>`).join('')}</div>
+        </div>` : ''}
+      <div style="margin-top:32px;text-align:right">
+        <a class="btn-gold" onclick="bookingNext()" style="cursor:pointer;opacity:${st.plan?1:.4}">Continue →</a>
+      </div>`;
+  } else if (st.step === 2) {
+    stepContent = `
+      <div class="card"><div class="card-body">
+        <h3 style="font-family:var(--serif);font-size:22px;font-weight:400;margin-bottom:24px">Select a Date</h3>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:32px">
+          ${dates.map(d => `
+            <div class="date-chip ${st.date===d.value?'selected':''}" onclick="selectDate('${d.value}')">
+              <p style="font-family:var(--sans);font-size:13px;color:${st.date===d.value?'var(--gold)':'var(--text)'};font-weight:500">${d.label}</p>
+            </div>`).join('')}
+        </div>
+        ${st.date ? `
+          <h3 style="font-family:var(--serif);font-size:22px;font-weight:400;margin-bottom:20px">Select Time</h3>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px">
+            ${times.map(t => `<div class="time-chip ${st.time===t?'selected':''}" onclick="selectTime('${t}')">${t}</div>`).join('')}
+          </div>` : ''}
+      </div></div>
+      <div style="display:flex;justify-content:space-between;margin-top:28px">
+        <a class="btn-gold ghost" onclick="bookingBack()" style="cursor:pointer">← Back</a>
+        <a class="btn-gold" onclick="bookingNext()" style="cursor:pointer;opacity:${st.date&&st.time?1:.4}">Continue →</a>
+      </div>`;
+  } else if (st.step === 3) {
+    stepContent = `
+      <div class="card"><div class="card-body">
+        <h3 style="font-family:var(--serif);font-size:22px;font-weight:400;margin-bottom:24px">Your Details</h3>
+        <div style="margin-bottom:20px">
+          <label style="font-family:var(--sans);font-size:12px;color:var(--muted);letter-spacing:.5px;display:block;margin-bottom:8px">Full Name *</label>
+          <input class="form-input" type="text" placeholder="e.g. Priya Sharma" id="form-name" value="${st.form.name}" oninput="bookingState.form.name=this.value">
+        </div>
+        <div style="margin-bottom:20px">
+          <label style="font-family:var(--sans);font-size:12px;color:var(--muted);letter-spacing:.5px;display:block;margin-bottom:8px">WhatsApp Number *</label>
+          <input class="form-input" type="tel" placeholder="+91 98765 43210" id="form-phone" value="${st.form.phone}" oninput="bookingState.form.phone=this.value">
+        </div>
+        <div style="margin-bottom:20px">
+          <label style="font-family:var(--sans);font-size:12px;color:var(--muted);letter-spacing:.5px;display:block;margin-bottom:8px">Email (optional)</label>
+          <input class="form-input" type="email" placeholder="your@email.com" id="form-email" value="${st.form.email}" oninput="bookingState.form.email=this.value">
+        </div>
+        <div>
+          <label style="font-family:var(--sans);font-size:12px;color:var(--muted);letter-spacing:.5px;display:block;margin-bottom:8px">Your Question (optional)</label>
+          <textarea class="form-input" rows="3" placeholder="What would you like guidance on?" id="form-question" oninput="bookingState.form.question=this.value">${st.form.question}</textarea>
+        </div>
+      </div></div>
+      <div style="display:flex;justify-content:space-between;margin-top:28px">
+        <a class="btn-gold ghost" onclick="bookingBack()" style="cursor:pointer">← Back</a>
+        <a class="btn-gold" onclick="bookingNext()" style="cursor:pointer;opacity:${st.form.name&&st.form.phone?1:.4}">Review & Confirm →</a>
+      </div>`;
+  } else if (st.step === 4) {
+    const plan = PLANS.find(p=>p.id===st.plan) || {};
+    const svc = SERVICES.find(s=>s.id===st.service);
+    stepContent = `
+      <div class="card"><div class="card-body text-center">
+        <div style="font-size:48px;margin-bottom:20px">✨</div>
+        <h3 style="font-family:var(--serif);font-size:28px;font-weight:400;margin-bottom:12px">Booking <span class="gold">Confirmed</span></h3>
+        <p style="font-family:var(--sans);font-size:14px;color:var(--muted);margin-bottom:28px;line-height:1.7">Your session is scheduled. Here's a summary:</p>
+        <div style="text-align:left;background:rgba(255,255,255,.03);border-radius:16px;padding:24px;margin-bottom:28px;border:1px solid rgba(212,168,83,.08)">
+          ${[
+            {l:'Plan',v:plan.name||'—'},
+            {l:'Service',v:svc?svc.title:'General'},
+            {l:'Date',v:st.date||'—'},
+            {l:'Time',v:st.time||'—'},
+            {l:'Name',v:st.form.name},
+            {l:'WhatsApp',v:st.form.phone},
+            {l:'Amount',v:'₹'+(plan.price||0).toLocaleString()}
+          ].map(r => `<div class="confirm-row"><span style="font-family:var(--sans);font-size:13px;color:var(--muted)">${r.l}</span><span style="font-family:var(--sans);font-size:13px;font-weight:500;${r.l==='Amount'?'color:var(--gold)':''}">${r.v}</span></div>`).join('')}
+        </div>
+        <div style="background:rgba(37,211,102,.08);border-radius:12px;padding:16px 20px;margin-bottom:28px;border:1px solid rgba(37,211,102,.15)">
+          <p style="font-family:var(--sans);font-size:13px;color:#25D366">💬 A confirmation message will be sent to your WhatsApp. I'll reach out before your session to confirm.</p>
+        </div>
+        <a href="${WA}" class="btn-gold" style="display:inline-flex">Message Me on WhatsApp →</a>
+      </div></div>`;
+  }
+
+  return `<div class="section page-transition"><div class="container">
+    <div class="reveal text-center"><p class="label">✧ Book a Session</p><h2 class="title">Begin Your <span class="gold">Journey</span></h2><div class="divider"></div></div>
+    <div class="reveal progress-bar" style="transition-delay:.1s">
+      ${steps.map((s,i) => `
+        <div class="progress-step">
+          <div class="progress-circle ${st.step>i+1?'done':st.step===i+1?'active':'pending'}">${st.step>i+1?'✓':i+1}</div>
+          <span class="progress-label" style="color:${st.step===i+1?'var(--gold)':'var(--muted)'}">${s}</span>
+          ${i<3?'<div class="progress-line desk-only"></div>':''}
+        </div>`).join('')}
+    </div>
+    <div class="reveal" style="max-width:700px;margin:0 auto;transition-delay:.2s">${stepContent}</div>
+  </div></div>`;
+}
+
+function selectPlan(id) { bookingState.plan = id; renderPage(); }
+function selectService(id) { bookingState.service = id; renderPage(); }
+function selectDate(d) { bookingState.date = d; renderPage(); }
+function selectTime(t) { bookingState.time = t; renderPage(); }
+function bookingNext() {
+  const st = bookingState;
+  if (st.step===1 && st.plan) { st.step=2; renderPage(); }
+  else if (st.step===2 && st.date && st.time) { st.step=3; renderPage(); }
+  else if (st.step===3 && st.form.name && st.form.phone) { st.step=4; renderPage(); }
+}
+function bookingBack() { bookingState.step = Math.max(1, bookingState.step-1); renderPage(); }
+
+// ─────────── ABOUT ───────────
+function renderAbout() {
+  return `<div class="section page-transition"><div class="container">
+    <div class="reveal text-center"><p class="label">✧ About</p><h2 class="title">The Reader Behind the <span class="gold">Cards</span></h2><div class="divider"></div></div>
+    <div style="max-width:720px;margin:56px auto 0">
+      <div class="reveal" style="display:flex;gap:36px;align-items:flex-start;flex-wrap:wrap;justify-content:center">
+        <div style="width:220px;height:280px;border-radius:20px;background:linear-gradient(145deg,rgba(45,27,78,.5),rgba(10,10,15,.8));border:1px solid rgba(212,168,83,.12);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;flex-shrink:0">
+          <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--gold),rgba(212,168,83,.3));display:flex;align-items:center;justify-content:center;font-size:28px;font-family:var(--serif);color:#0A0A0F;font-weight:600">A</div>
+          <p style="font-family:var(--sans);font-size:10px;color:var(--muted);letter-spacing:1px">YOUR PHOTO HERE</p>
+        </div>
+        <div style="flex:1;min-width:280px">
+          <p style="font-family:var(--serif);font-size:20px;line-height:1.8;font-weight:300;font-style:italic;color:rgba(232,228,221,.8);margin-bottom:20px">"I don't predict your future. I help you understand the energy around you — so you can shape it yourself."</p>
+          <p style="font-family:var(--sans);font-size:14px;color:var(--muted);line-height:1.8;margin-bottom:16px">My journey with tarot began over seven years ago during a time of deep personal uncertainty. What started as curiosity became a calling. Today, I've guided 2,000+ individuals across India through love crises, career crossroads, family tensions, and moments of profound self-doubt.</p>
+          <p style="font-family:var(--sans);font-size:14px;color:var(--muted);line-height:1.8;margin-bottom:16px">I approach every reading with radical honesty and deep empathy. I won't tell you what you want to hear — I'll tell you what you need to know. And I'll do it with care, context, and a clear path forward.</p>
+          <p style="font-family:var(--sans);font-size:14px;color:var(--muted);line-height:1.8">My readings combine classical Rider-Waite tarot wisdom with strong intuitive channeling. I'm fluent in both English and Hindi, and I create a safe, judgment-free space for every client.</p>
+        </div>
+      </div>
+      <div class="grid-3 reveal" style="margin-top:48px;transition-delay:.2s">
+        ${[
+          {t:"My Approach",d:"Intuitive reading combined with practical guidance. I focus on what you can actually do, not vague predictions."},
+          {t:"My Promise",d:"100% confidentiality, no judgment, no sugarcoating. You get the truth delivered with genuine care."},
+          {t:"My Space",d:"Sessions happen via call or video at your convenience. No need to travel — clarity comes to you."}
+        ].map(c => `
+          <div class="card"><div class="card-body-sm">
+            <h4 style="font-family:var(--serif);font-size:18px;font-weight:500;margin-bottom:10px;color:var(--gold)">${c.t}</h4>
+            <p style="font-family:var(--sans);font-size:13px;color:var(--muted);line-height:1.7">${c.d}</p>
+          </div></div>`).join('')}
+      </div>
+      <div class="reveal text-center" style="margin-top:48px;transition-delay:.3s">
+        <a class="btn-gold" onclick="navigate('booking')" style="cursor:pointer">Book a Session With Me →</a>
+      </div>
+    </div>
+  </div></div>`;
+}
+
+// ─────────── TESTIMONIALS ───────────
+function renderTestimonials() {
+  return `<div class="section page-transition"><div class="container">
+    <div class="reveal text-center"><p class="label">✧ Testimonials</p><h2 class="title">Real People, Real <span class="gold">Transformations</span></h2><p class="body-text" style="margin-top:12px">Every story here represents a moment of clarity that changed someone's path.</p><div class="divider"></div></div>
+    <div class="grid-2" style="margin-top:56px">
+      ${TESTIMONIALS.map((t,i) => `<div class="reveal" style="transition-delay:${i*.08}s">${testimonialCard(t)}</div>`).join('')}
+    </div>
+    <div class="reveal text-center" style="margin-top:56px;transition-delay:.5s">
+      <p style="font-family:var(--serif);font-size:22px;font-weight:400;margin-bottom:16px">Ready to write your own story?</p>
+      <a class="btn-gold" onclick="navigate('booking')" style="cursor:pointer">Book Your First Reading →</a>
+    </div>
+  </div></div>`;
+}
+
+// ─────────── CONTACT ───────────
+function renderContact() {
+  return `<div class="section page-transition"><div class="container">
+    <div class="reveal text-center"><p class="label">✧ Contact</p><h2 class="title">Let's <span class="gold">Connect</span></h2><p class="body-text" style="margin-top:12px;max-width:440px">Have a question before booking? Reach out through any of these channels.</p><div class="divider"></div></div>
+    <div class="grid-2" style="max-width:800px;margin:56px auto 0">
+      <div class="reveal" style="display:flex;flex-direction:column;gap:16px">
+        ${[
+          {icon:'💬',title:'WhatsApp',sub:'Fastest way to reach me',detail:'+91 98765 43210',href:WA,color:'#25D366'},
+          {icon:'📞',title:'Phone',sub:'Available 10 AM – 9 PM IST',detail:'+91 98765 43210',href:PH,color:'var(--gold)'},
+          {icon:'✉',title:'Email',sub:'For detailed queries',detail:'hello@aanyasharma.com',href:'mailto:hello@aanyasharma.com',color:'var(--gold)'}
+        ].map(c => `
+          <a href="${c.href}" class="card" style="display:block">
+            <div class="card-body-sm contact-card">
+              <div class="contact-icon">${c.icon}</div>
+              <div>
+                <p style="font-family:var(--sans);font-size:15px;font-weight:500;margin-bottom:2px">${c.title}</p>
+                <p style="font-family:var(--sans);font-size:12px;color:var(--muted)">${c.sub}</p>
+                <p style="font-family:var(--sans);font-size:13px;color:${c.color};margin-top:4px">${c.detail}</p>
+              </div>
+            </div>
+          </a>`).join('')}
+      </div>
+      <div class="card reveal" style="transition-delay:.15s" id="contactCard">
+        <div class="card-body">
+          <h3 style="font-family:var(--serif);font-size:20px;font-weight:400;margin-bottom:20px">Send a Quick Message</h3>
+          <div style="margin-bottom:16px"><input class="form-input" type="text" placeholder="Your Name" id="contact-name"></div>
+          <div style="margin-bottom:16px"><input class="form-input" type="tel" placeholder="WhatsApp Number" id="contact-phone"></div>
+          <div style="margin-bottom:16px"><textarea class="form-input" rows="4" placeholder="Your Message" id="contact-msg"></textarea></div>
+          <a class="btn-gold" onclick="submitContact()" style="width:100%;justify-content:center;cursor:pointer">Send Message →</a>
+        </div>
+      </div>
+    </div>
+  </div></div>`;
+}
+
+function submitContact() {
+  const card = document.getElementById('contactCard');
+  card.querySelector('.card-body').innerHTML = `
+    <div style="text-align:center;padding:30px 0">
+      <div style="font-size:40px;margin-bottom:16px">✨</div>
+      <h3 style="font-family:var(--serif);font-size:22px;font-weight:400;margin-bottom:8px">Message Sent!</h3>
+      <p style="font-family:var(--sans);font-size:14px;color:var(--muted)">I'll get back to you within a few hours.</p>
+    </div>`;
+}
+
+// ═══════════════════ INIT ═══════════════════
+document.getElementById('app').style.transition = 'opacity .25s ease, transform .25s ease';
+renderPage();
+</script>
+</body>
+</html>
